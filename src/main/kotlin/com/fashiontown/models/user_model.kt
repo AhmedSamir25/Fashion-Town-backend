@@ -6,6 +6,7 @@ import org.mindrot.jbcrypt.BCrypt
 @Serializable
 data class UserModel(
     val name:String,
+    val  email:String,
     val password:String
 ) {
     fun EncryptingPassword():String{
