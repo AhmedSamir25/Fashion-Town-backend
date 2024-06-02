@@ -33,4 +33,8 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    implementation("org.ktorm:ktorm-core:3.6.0")
+    implementation("mysql:mysql-connector-java:8.0.33")
+    implementation("org.mindrot:jbcrypt:0.4")
+
 }
