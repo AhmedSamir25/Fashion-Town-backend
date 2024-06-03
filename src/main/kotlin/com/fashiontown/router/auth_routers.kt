@@ -1,7 +1,7 @@
 import com.fashiontown.models.UserModel
 import com.fashiontown.db.DatabaseConnection
 import com.fashiontown.entities.UserEntity
-import com.fashiontown.models.ResponseUser
+import com.fashiontown.models.ResponseApp
 import com.fashiontown.models.UserSignIn
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -24,7 +24,7 @@ fun Application.authRoutes (){
                if (emailVali != null ){
 
                    call.respond(
-                       HttpStatusCode.BadRequest, ResponseUser(
+                       HttpStatusCode.BadRequest, ResponseApp(
                            data = "email already exits",
                            success = false,))
                    return@post
@@ -35,7 +35,7 @@ fun Application.authRoutes (){
                        set(it.password,password)
                    }
                    call.respond(
-                       HttpStatusCode.OK, ResponseUser(
+                       HttpStatusCode.OK, ResponseApp(
                            data = "done sign up",
                            success = true,)
                    )
@@ -57,7 +57,7 @@ fun Application.authRoutes (){
 
             if(userCheck == null ){
                 call.respond(
-                    HttpStatusCode.BadRequest, ResponseUser(
+                    HttpStatusCode.BadRequest, ResponseApp(
                         data = "email and password is wrong",
                         success = false,))
                 return@post
@@ -65,7 +65,7 @@ fun Application.authRoutes (){
             val  passwordMatch = BCrypt.checkpw(password,userCheck?.password)
             if ( !passwordMatch){
                 call.respond(
-                    HttpStatusCode.BadRequest, ResponseUser(
+                    HttpStatusCode.BadRequest, ResponseApp(
                         data = "email and password is wrong",
                         success = false,))
                 return@post
@@ -73,7 +73,7 @@ fun Application.authRoutes (){
             }
 
                 call.respond(
-                    HttpStatusCode.OK, ResponseUser(
+                    HttpStatusCode.OK, ResponseApp(
                         data = "good",
                         success = true,))
 

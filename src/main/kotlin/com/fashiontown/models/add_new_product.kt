@@ -3,8 +3,7 @@ package com.fashiontown.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProductsData(
-    val productId:Int,
+data class AddNewProduct(
     val productName:String,
     val productImage:String,
     val productCategories:String,

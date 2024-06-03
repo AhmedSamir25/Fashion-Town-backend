@@ -2,14 +2,15 @@ package com.fashiontown.router
 
 import com.fashiontown.db.DatabaseConnection
 import com.fashiontown.entities.ProductsEntity
+import com.fashiontown.models.AddNewProduct
 import com.fashiontown.models.ProductsData
+import com.fashiontown.models.ResponseApp
+import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.ktorm.dsl.from
-import org.ktorm.dsl.map
-import org.ktorm.dsl.select
-import org.ktorm.dsl.where
+import org.ktorm.dsl.*
 
 fun Application.productsRouter (){
     val db = DatabaseConnection.database
@@ -32,6 +33,31 @@ fun Application.productsRouter (){
                    )
            }
             call.respond(getAllProducts)
+        }
+        post("/addproduct"){
+            val request = call.receive<AddNewProduct>()
+            val addNewProduct =  db.insert(ProductsEntity){
+                set(it.productName,request.productName)
+                set(it.productImage,request.productImage)
+                set(it.productPrice,request.productPrice)
+                set(it.productCategories,request.productCategories)
+                set(it.productDescription,request.productDescription)
+                set(it.productReviews,request.productReviews)
+                set(it.productRating,request.productRating)
+            }
+            if (addNewProduct == 1){
+                call.respond(
+                    HttpStatusCode.OK, ResponseApp(
+                    data = "note has ben add",
+                    success = true,
+                ))
+            }else {
+                call.respond(
+                    HttpStatusCode.OK, ResponseApp(
+                    data = "note has ben Field",
+                    success = false,
+                ))
+            }
         }
     }
 }

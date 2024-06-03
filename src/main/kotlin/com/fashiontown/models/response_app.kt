@@ -1,6 +1,6 @@
 package com.fashiontown.models
 
-data class ResponseUser<T>(
+data class ResponseApp<T>(
     val data:T,
     val success:Boolean
 )
