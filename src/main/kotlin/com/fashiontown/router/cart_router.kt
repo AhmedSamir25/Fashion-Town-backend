@@ -42,5 +42,31 @@ inner join cart on cart.cart_product_id= mycart.cart_product_id  and cart.cart_u
                 call.respond(HttpStatusCode.OK, results)
             } ?: call.respond(HttpStatusCode.InternalServerError, "Connection failed")
             }
+        get("/totalpricecart/{userid}") {
+            val userid = call.parameters["userid"]
+            val conn = DriverManager.getConnection(Databaseco.url, Databaseco.user, Databaseco.password)
+            conn?.use {
+                val sql = """ 
+            SELECT SUM(cart_product_qt * product_price) AS total_sum
+            FROM mycart
+            WHERE cart_user_id = ${userid};
+""".trimIndent()
+                val stmt = it.createStatement()
+                val rs = stmt.executeQuery(sql)
+                val results = mutableListOf<Map<String, Any>>()
+                while (rs.next()) {
+                    val totalSum = rs.getInt("total_sum")
+                    results.add(
+                        mapOf(
+                            "total_sum" to totalSum
+                        )
+                    )
+                }
+                rs.close()
+                stmt.close()
+                call.respond(HttpStatusCode.OK, results)
+            } ?: call.respond(HttpStatusCode.InternalServerError, "Connection failed")
+
+        }
         }
     }

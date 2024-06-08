@@ -60,7 +60,19 @@ fun Application.addCartRouter (){
             }
         }
         put("/cart/product/{cartid}"){
-
+            val cartid = call.parameters["cartid"]?.toInt() ?: -1
+            val updateProductQt = call.receive<CartModel>()
+            val rowEffected = db.update(CartEnities){
+                set(it.productQt , updateProductQt.productQt)
+                where { it.cartID eq cartid }
+            }
+            if (rowEffected == 1){
+                call.respond(HttpStatusCode.OK,ResponseApp("productQt has been update",true))
+            }else{
+                call.respond(HttpStatusCode.BadRequest,
+                    ResponseApp("field update productQt",false))
+            }
         }
+
     }
 }
