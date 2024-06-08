@@ -188,6 +188,7 @@ fun Application.productsRouter (){
              call.respond(categoriesProducts)
 
         }
+        // update product
         put("/product/{id}"){
             val productId = call.parameters["id"]?.toInt() ?: -1
             val updateProduct = call.receive<ProductsData>()
@@ -206,6 +207,7 @@ fun Application.productsRouter (){
             }
 
         }
+        // delete product
         delete("/product/{id}"){
             val productId = call.parameters["id"]?.toInt() ?: -1
             val rowEffected = db.delete(ProductsEntity){
@@ -217,6 +219,7 @@ fun Application.productsRouter (){
                 call.respond(HttpStatusCode.BadRequest,ResponseApp("field delete product",false))
             }
         }
+        // update product
         put("/categories/{id}"){
             val categoriesId = call.parameters["id"]?.toInt() ?: -1
             val updateCategories = call.receive<CategoriesData>()
@@ -231,6 +234,7 @@ fun Application.productsRouter (){
                     ResponseApp("field update categories",false))
             }
         }
+        // delete product
         delete ("/categories/{id}"){
             val categoriesId = call.parameters["id"]?.toInt() ?: -1
             val updateCategories = call.receive<CategoriesData>()

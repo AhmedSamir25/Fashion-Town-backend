@@ -41,10 +41,10 @@ fun Application.favoriteRouter() {
                 }
                 if (rowEffected == 1){
                     call.respond(HttpStatusCode.OK,
-                        ResponseApp("categories has been delete",true))
+                        ResponseApp("product has been delete",true))
                 }else{
                     call.respond(HttpStatusCode.BadRequest,
-                        ResponseApp("field delete categories",false))
+                        ResponseApp("field delete product",false))
                 }
             }
 

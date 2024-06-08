@@ -17,4 +17,6 @@ fun Application.configureRouting() {
     favoriteRouter()
     myFavoriteRouter()
     getProductsRouter()
+    cartRouter()
+    addCartRouter()
 }
