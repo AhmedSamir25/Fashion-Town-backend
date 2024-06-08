@@ -14,7 +14,8 @@ import org.ktorm.dsl.*
 fun Application.productsRouter (){
     val db = DatabaseConnection.database
     routing {
-        get("/getallproducts") {
+        // get all products
+        get("/products") {
             val getAllProducts = db.from(ProductsEntity).select().map {
                 val productId = it[ProductsEntity.productId]
                 val productName = it[ProductsEntity.productName]
@@ -37,7 +38,8 @@ fun Application.productsRouter (){
             }
             call.respond(getAllProducts)
         }
-        post("/addproduct") {
+        // add product
+        post("/product") {
             val request = call.receive<AddNewProduct>()
             val addNewProduct = db.insert(ProductsEntity) {
                 set(it.productName, request.productName)
@@ -64,7 +66,8 @@ fun Application.productsRouter (){
                 )
             }
         }
-        get("/productdetails/{id}") {
+        // product details
+        get("/product/{id}") {
             val id = call.parameters["id"]?.toInt() ?: -1
             val productDetails = db.from(ProductsEntity).select().where(
                 ProductsEntity.productId eq id
@@ -106,7 +109,8 @@ fun Application.productsRouter (){
                 )
             }
         }
-        post("/addcategorie") {
+        // add categories
+        post("/categories") {
             val request = call.receive<AddNewCategorie>()
             val checkcate = db.from(CategoriesEntities).select().where(
                 CategoriesEntities.categorieName eq request.categorieName
@@ -142,7 +146,8 @@ fun Application.productsRouter (){
             }
             }
         }
-        get("/getcategories"){
+        // get all categories
+        get("/categories"){
 
             val getCategories = db.from(CategoriesEntities).select().map {
                 val categoriesId = it[CategoriesEntities.categoriesId]
@@ -154,36 +159,36 @@ fun Application.productsRouter (){
             }
             call.respond(getCategories)
         }
-        get("/getproductscategories/{categories}"){
+        // get product by categories
+        get("/products/categories/{categories}"){
             val categories = call.parameters["categories"]?: ""
-            val categoriesProducts = db.from(CategoriesEntities).select().where(
-                CategoriesEntities.categorieName eq categories
+            val categoriesProducts = db.from(ProductsEntity).select().where(
+                ProductsEntity.productCategories eq categories
             ).map {
-                val categoriesId = it[CategoriesEntities.categoriesId]
-                val categoriesName = it[CategoriesEntities.categorieName]
-                val categoriesProduct = CategoriesData(
-                    categoriesId = categoriesId ?: -1,
-                    categoriesName = categoriesName ?: "",
+                val productId = it[ProductsEntity.productId]
+                val productName = it[ProductsEntity.productName]
+                val productImage = it[ProductsEntity.productImage]
+                val productCategories = it[ProductsEntity.productCategories]
+                val productPrice = it[ProductsEntity.productPrice]
+                val productDescription = it[ProductsEntity.productDescription]
+                val productReviews = it[ProductsEntity.productReviews]
+                val productRating = it[ProductsEntity.productRating]
+                 ProductsData(
+                    productId = productId ?: -1,
+                    productName = productName ?: "",
+                    productImage = productImage ?: "",
+                    productDescription = productDescription ?: "",
+                    productPrice = productPrice ?: 0.0,
+                    productCategories = productCategories ?: "",
+                    productReviews = productReviews ?: 1,
+                    productRating = productRating ?: "",
                     )
-                call.respond(categoriesProduct)
-            }.firstOrNull()
-            if (categoriesProducts == null) {
-                call.respond(
-                    HttpStatusCode.NotFound, ResponseApp(
-                        data = "There are no products in this categorie",
-                        success = false,
-                    )
-                )
-            } else {
-                call.respond(
-                    HttpStatusCode.OK, ResponseApp(
-                        data = "products in this categorie",
-                        success = true,
-                    )
-                )
+
             }
+             call.respond(categoriesProducts)
+
         }
-        put("/updateproduct/{id}"){
+        put("/product/{id}"){
             val productId = call.parameters["id"]?.toInt() ?: -1
             val updateProduct = call.receive<ProductsData>()
             val rowEffected = db.update(ProductsEntity){
@@ -201,7 +206,7 @@ fun Application.productsRouter (){
             }
 
         }
-        delete("/deleteproduct/{id}"){
+        delete("/product/{id}"){
             val productId = call.parameters["id"]?.toInt() ?: -1
             val rowEffected = db.delete(ProductsEntity){
                 it.productId eq productId
@@ -210,6 +215,34 @@ fun Application.productsRouter (){
                 call.respond(HttpStatusCode.OK,ResponseApp("product has been delete",true))
             }else{
                 call.respond(HttpStatusCode.BadRequest,ResponseApp("field delete product",false))
+            }
+        }
+        put("/categories/{id}"){
+            val categoriesId = call.parameters["id"]?.toInt() ?: -1
+            val updateCategories = call.receive<CategoriesData>()
+            val rowEffected = db.update(CategoriesEntities){
+                set(it.categorieName,updateCategories.categoriesName)
+                where {it.categoriesId eq categoriesId}
+            }
+            if (rowEffected == 1){
+                call.respond(HttpStatusCode.OK,ResponseApp("categories has been update",true))
+            }else{
+                call.respond(HttpStatusCode.BadRequest,
+                    ResponseApp("field update categories",false))
+            }
+        }
+        delete ("/categories/{id}"){
+            val categoriesId = call.parameters["id"]?.toInt() ?: -1
+            val updateCategories = call.receive<CategoriesData>()
+            val rowEffected = db.delete(CategoriesEntities){
+                 it.categoriesId eq categoriesId
+            }
+            if (rowEffected == 1){
+                call.respond(HttpStatusCode.OK,
+                    ResponseApp("categories has been delete",true))
+            }else{
+                call.respond(HttpStatusCode.BadRequest,
+                    ResponseApp("field delete categories",false))
             }
         }
     }
