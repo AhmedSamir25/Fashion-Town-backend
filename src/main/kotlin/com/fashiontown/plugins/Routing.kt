@@ -1,9 +1,7 @@
 package com.fashiontown.plugins
 
 import authRoutes
-import com.fashiontown.router.favoriteRouter
-import com.fashiontown.router.getProductsRouter
-import com.fashiontown.router.productsRouter
+import com.fashiontown.router.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -17,5 +15,6 @@ fun Application.configureRouting() {
     authRoutes()
     productsRouter()
     favoriteRouter()
+    myFavoriteRouter()
     getProductsRouter()
 }

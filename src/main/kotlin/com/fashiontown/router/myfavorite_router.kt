@@ -7,9 +7,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.DriverManager
 
-fun Application.favoriteRouter () {
+fun Application.myFavoriteRouter () {
     routing {
-        get("/getfavoriteproducts{userid}") {
+        get("/favorite/user/{userid}") {
             val userid = call.parameters["userid"]
             val conn = DriverManager.getConnection(Databaseco.url, Databaseco.user, Databaseco.password)
             conn?.use {
@@ -33,12 +33,14 @@ inner join favorite on favorite.favorite_product_id = myfavorite.product_id and 
                         "favorite_user_id" to  favoriteUserId,"favorite_product_id" to favoriteProductID,
                         "product_name" to productName,"product_image" to productImage,
                         "product_price" to productPrice,"product_rating" to productRating
-                        ))
+                    ))
                 }
                 rs.close()
                 stmt.close()
                 call.respond(HttpStatusCode.OK, results)
             } ?: call.respond(HttpStatusCode.InternalServerError, "Connection failed")
         }
+
     }
+
 }
