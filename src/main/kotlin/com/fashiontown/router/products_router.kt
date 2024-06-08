@@ -64,7 +64,7 @@ fun Application.productsRouter (){
                 )
             }
         }
-        get("/productdetails{id}") {
+        get("/productdetails/{id}") {
             val id = call.parameters["id"]?.toInt() ?: -1
             val productDetails = db.from(ProductsEntity).select().where(
                 ProductsEntity.productId eq id
@@ -108,6 +108,18 @@ fun Application.productsRouter (){
         }
         post("/addcategorie") {
             val request = call.receive<AddNewCategorie>()
+            val checkcate = db.from(CategoriesEntities).select().where(
+                CategoriesEntities.categorieName eq request.categorieName
+            ).map {
+                it[CategoriesEntities.categorieName]
+            }.firstOrNull()
+            if(checkcate != null){
+                call.respond(
+                    HttpStatusCode.BadRequest, ResponseApp(
+                        data = "categorie already exits",
+                        success = false,))
+                return@post
+            }else{
             val addNewCategories = db.insert(CategoriesEntities) {
                 set(it.categorieName, request.categorieName)
             }
@@ -128,6 +140,7 @@ fun Application.productsRouter (){
                     )
                 )
             }
+            }
         }
         get("/getcategories"){
 
@@ -140,6 +153,64 @@ fun Application.productsRouter (){
                 )
             }
             call.respond(getCategories)
+        }
+        get("/getproductscategories/{categories}"){
+            val categories = call.parameters["categories"]?: ""
+            val categoriesProducts = db.from(CategoriesEntities).select().where(
+                CategoriesEntities.categorieName eq categories
+            ).map {
+                val categoriesId = it[CategoriesEntities.categoriesId]
+                val categoriesName = it[CategoriesEntities.categorieName]
+                val categoriesProduct = CategoriesData(
+                    categoriesId = categoriesId ?: -1,
+                    categoriesName = categoriesName ?: "",
+                    )
+                call.respond(categoriesProduct)
+            }.firstOrNull()
+            if (categoriesProducts == null) {
+                call.respond(
+                    HttpStatusCode.NotFound, ResponseApp(
+                        data = "There are no products in this categorie",
+                        success = false,
+                    )
+                )
+            } else {
+                call.respond(
+                    HttpStatusCode.OK, ResponseApp(
+                        data = "products in this categorie",
+                        success = true,
+                    )
+                )
+            }
+        }
+        put("/updateproduct/{id}"){
+            val productId = call.parameters["id"]?.toInt() ?: -1
+            val updateProduct = call.receive<ProductsData>()
+            val rowEffected = db.update(ProductsEntity){
+                set(it.productName,updateProduct.productName)
+                set(it.productPrice,updateProduct.productPrice)
+                set(it.productImage,updateProduct.productImage)
+                set(it.productDescription,updateProduct.productDescription)
+                set(it.productCategories,updateProduct.productCategories)
+                where {it.productId eq productId}
+            }
+            if (rowEffected == 1){
+                call.respond(HttpStatusCode.OK,ResponseApp("product has been update",true))
+            }else{
+                call.respond(HttpStatusCode.BadRequest,ResponseApp("field update product",false))
+            }
+
+        }
+        delete("/deleteproduct/{id}"){
+            val productId = call.parameters["id"]?.toInt() ?: -1
+            val rowEffected = db.delete(ProductsEntity){
+                it.productId eq productId
+            }
+            if (rowEffected == 1){
+                call.respond(HttpStatusCode.OK,ResponseApp("product has been delete",true))
+            }else{
+                call.respond(HttpStatusCode.BadRequest,ResponseApp("field delete product",false))
+            }
         }
     }
 }

@@ -6,6 +6,6 @@ import org.ktorm.schema.int
 import org.ktorm.schema.varchar
 
 object CategoriesEntities: Table<Nothing>(tableName = "categories"){
-    val categoriesId = int("id").primaryKey()
+    val categoriesId = int("categorie_id").primaryKey()
     val categorieName = varchar("categorie_name")
 }
